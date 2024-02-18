@@ -6,6 +6,13 @@ RED='\033[1;31m'
 NC='\033[0m' # No Color
 
 function main() {
+	if [ -z "$1" ] || [ -z "$2" ]; then 
+		echo -e "${RED}not enough arguments error${NC}" 
+		echo 'Usage: "usbcp /path/from /path/to"'
+		echo -e "${RED}Quiting...${NC}" 
+		return
+	fi
+
 	fileFrom=$1
 	fileTo=$2
 
