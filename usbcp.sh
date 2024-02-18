@@ -32,6 +32,8 @@ function main() {
 		return
 	fi
 
+	rm -f ./rsync.err
+
 	echo '2. Syncing...'
 
 	sync &
