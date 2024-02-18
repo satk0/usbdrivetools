@@ -11,17 +11,24 @@ function main() {
 		return
 	fi
 
-	fileFrom=$1
-	fileTo=$2
+	args=( "$@" )
+	pathsFrom=( "${args[@]:: ${#args[@]}-1}" )
+	pathTo=${args[-1]}
+
+	echo "${pathsFrom[@]}"
+	echo "${pathTo}"
 
 	startTime=$SECONDS
 
 	echo '1. Running rsync...'
-	rsyncErr=$(rsync -avP "$fileFrom" "$fileTo" 2>&1 > /dev/null)
-	if [ "$rsyncErr" != '' ]; then
-		echo -e "${RED}\"rsync\" execution error:${NC}"
-		echo "$rsyncErr"
-		echo -e "${RED}Quiting...${NC}"
+	rsync -avP "${pathsFrom[@]}" "$pathTo" 2>rsync.err
+
+	# check any errors
+	if [ -s rsync.err ]; then
+		echo -e "${RED}\"rsync\" execution error:${NC}" >&2
+		cat rsync.err >&2	
+		rm -f ./rsync.err
+		echo -e "${RED}Quiting...${NC}" >&2
 		return
 	fi
 
