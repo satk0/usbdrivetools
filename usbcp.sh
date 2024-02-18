@@ -4,7 +4,7 @@ function main() {
 	fileFrom=$1
 	fileTo=$2
 
-	start_time=$SECONDS
+	startTime=$SECONDS
 
 	echo '1. Running rsync...'
 	rsync -avP "$fileFrom" "$fileTo"
@@ -13,22 +13,24 @@ function main() {
 
 	sync &
 	pID=$!; 
-	res=""
+	killErr=""
 
-	while [ "$res" = "" ]; do
-		res=$(kill -0 "$pID" 2>&1 > /dev/null)
-		tmp=$(grep -E '(Dirty|Writeback):' /proc/meminfo)
+	while [ "$killErr" = "" ]; do
+		killErr=$(kill -0 "$pID" 2>&1 > /dev/null)
+		cacheInfo=$(grep -E '(Dirty|Writeback):' /proc/meminfo)
 
-		echo "$tmp"
+		echo "$cacheInfo"
 		sleep 0.5
 		
 		clearLastLines 2
 	done
 
-	elapsed_time=$(( SECONDS - start_time ))
+	echo "$cacheInfo"
 
-	echo "$tmp"
-	echo "Finished in: $elapsed_time seconds."
+	elapsedTime=$(( SECONDS - startTime ))
+	echo 'Finished in:'
+	date -ud "@$elapsedTime" +'%H hr %M min %S sec'
+	#echo "Finished in: $elapsedTime seconds."
 }
 
 # https://stackoverflow.com/a/78015981
