@@ -7,7 +7,7 @@ NC='\033[0m' # No Color
 
 function main() {
 	if [ -z "$1" ] || [ -z "$2" ]; then 
-		echo 'Usage: "usbcp /path/from /path/to"'
+		echo 'Usage: "usbcp /paths/from /path/to"'
 		return
 	fi
 
