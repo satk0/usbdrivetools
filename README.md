@@ -25,4 +25,6 @@ Symlink scripts to `~/.local/bin/` (run from project directory):
 
     ln -s "$PWD"/scripts/* ~/.local/bin/
 
-Made with Love ❤️ by [@satk0](https://github.com/satk0)
+------
+
+<p align="center"> Made with Love ❤️ </p>
