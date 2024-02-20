@@ -17,4 +17,12 @@ Tools available:
 
 ## Installation
 
+Clone the repo:
+
+    git clone git@github.com:satk0/usbdrivetools.git
+
+Symlink scripts to `~/.local/bin/` (run from project directory):
+
+    ln -s "$PWD"/scripts/* ~/.local/bin/
+
 Made with Love ❤️ by [@satk0](https://github.com/satk0)

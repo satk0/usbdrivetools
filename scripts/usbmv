@@ -7,8 +7,12 @@ NC='\033[0m' # No Color
 
 function main() {
 	if [ -z "$1" ] || [ -z "$2" ]; then 
-		echo '  Usage: usbcp SRC [SRC] DEST'
+		echo '  Usage: usbmv SRC[/] [SRC[/]] DEST'
 		echo 'Copy SRC to (USB mounted) DEST.'
+		echo ''
+		echo 'Key notes if SRC is directory:'
+		echo '  SRC/ - copies SRC directory into DEST.'
+		echo '  SRC - copies SRC directory contents into DEST.'
 		return
 	fi
 
@@ -22,10 +26,14 @@ function main() {
 	startTime=$SECONDS
 
 	echo '1. Running rsync...'
-	# NTFS, ExFAT, etc. support:
+	# For NTFS, ExFAT, etc. support:
 	# check: https://unix.stackexchange.com/a/532192
 	# and:   https://stackoverflow.com/a/668049
-	rsync -rlDvP "${pathsFrom[@]}" "$pathTo" 2>rsync.err
+	#
+	# moving files with rsync: https://unix.stackexchange.com/a/290276
+	rsync -rlDvP --remove-source-files "${pathsFrom[@]}" "$pathTo" 2>rsync.err 
+
+    # &&  find "${pathsFrom[@]}" -type d -empty -delete
 
 	# check any errors
 	if [ -s rsync.err ]; then

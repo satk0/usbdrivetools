@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+# Colors for 'echo' command
+GREEN='\033[1;32m'
+RED='\033[1;31m'
+NC='\033[0m' # No Color
+
+function main() {
+	if [ -z "$1" ] || [ -z "$2" ]; then 
+		echo '  Usage: usbcp SRC[/] [SRC[/]] DEST'
+		echo 'Copy SRC to (USB mounted) DEST.'
+		echo ''
+		echo 'Key notes if SRC is directory:'
+		echo '  SRC/ - copies SRC directory into DEST.'
+		echo '  SRC - copies SRC directory contents into DEST.'
+		return
+	fi
+
+	args=( "$@" )
+	pathsFrom=( "${args[@]:: ${#args[@]}-1}" )
+	pathTo=${args[-1]}
+
+	echo "${pathsFrom[@]}"
+	echo "${pathTo}"
+
+	startTime=$SECONDS
+
+	echo '1. Running rsync...'
+	# NTFS, ExFAT, etc. support:
+	# check: https://unix.stackexchange.com/a/532192
+	# and:   https://stackoverflow.com/a/668049
+	rsync -rlDvP "${pathsFrom[@]}" "$pathTo" 2>rsync.err
+
+	# check any errors
+	if [ -s rsync.err ]; then
+		echo -e "${RED}\"rsync\" execution error:${NC}" >&2
+		cat rsync.err >&2	
+		rm -f ./rsync.err
+		echo -e "${RED}Quiting...${NC}" >&2
+		return
+	fi
+
+	rm -f ./rsync.err
+
+	echo '2. Syncing...'
+
+	sync &
+	pID=$!; 
+	killErr=""
+
+	while [ "$killErr" = "" ]; do
+		killErr=$(kill -0 "$pID" 2>&1 > /dev/null)
+		cacheInfo=$(grep -E '(Dirty|Writeback):' /proc/meminfo)
+
+		echo "$cacheInfo"
+		sleep 0.5
+		
+		clearLastLines 2
+	done
+
+	echo "$cacheInfo"
+
+	elapsedTime=$(( SECONDS - startTime ))
+	echo 'Finished in:'
+	date -ud "@$elapsedTime" +'%H hr %M min %S sec'
+	echo -e "${GREEN}Copied successfully!${NC}"
+}
+
+# https://stackoverflow.com/a/78015981
+function clearLastLines() {
+	local linesToClear=$1
+
+	for (( i=0; i<linesToClear; i++ )); do
+		tput cuu 1
+		tput el
+	done
+}
+
+main "$@"; exit
