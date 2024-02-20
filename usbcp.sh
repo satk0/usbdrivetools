@@ -21,7 +21,10 @@ function main() {
 	startTime=$SECONDS
 
 	echo '1. Running rsync...'
-	rsync -avP "${pathsFrom[@]}" "$pathTo" 2>rsync.err
+	# NTFS, ExFAT, etc. support:
+	# check: https://unix.stackexchange.com/a/532192
+	# and:   https://stackoverflow.com/a/668049
+	rsync -rlDvP "${pathsFrom[@]}" "$pathTo" 2>rsync.err
 
 	# check any errors
 	if [ -s rsync.err ]; then
