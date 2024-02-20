@@ -25,6 +25,12 @@ Symlink scripts to `~/.local/bin/` (run from project directory):
 
     ln -s "$PWD"/scripts/* ~/.local/bin/
 
+-----
+
+## Demonstration
+
+![](https://github.com/satk0/usbdrivetools/blob/main/assets/usbcp.gif)
+
 ------
 
 <p align="center"> Made with Love ❤️ </p>
