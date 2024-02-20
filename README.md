@@ -1,4 +1,4 @@
-<h1 align="center"> <code>usbdtools</code> - USB Drive Tools </h1>
+<h1 align="center"> <code>usbdrivetools</code> - USB Drive Tools </h1>
 
 Simple bash tools that aim to help transfer files to USB Drive and monitor their syncing progress. 
 
