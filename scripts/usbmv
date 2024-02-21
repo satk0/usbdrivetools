@@ -11,8 +11,8 @@ function main() {
 		echo 'Copy SRC to (USB mounted) DEST.'
 		echo ''
 		echo 'Key notes if SRC is directory:'
-		echo '  SRC/ - copies SRC directory into DEST.'
-		echo '  SRC - copies SRC directory contents into DEST.'
+		echo '  SRC  - copies SRC directory into DEST.'
+		echo '  SRC/ - copies SRC directory contents into DEST.'
 		return
 	fi
 
@@ -31,9 +31,8 @@ function main() {
 	# and:   https://stackoverflow.com/a/668049
 	#
 	# moving files with rsync: https://unix.stackexchange.com/a/290276
-	rsync -rlDvP --remove-source-files "${pathsFrom[@]}" "$pathTo" 2>rsync.err 
-
-    # &&  find "${pathsFrom[@]}" -type d -empty -delete
+	rsync -rlDvP --remove-source-files "${pathsFrom[@]}" "$pathTo" 2>rsync.err &&  
+	find "${pathsFrom[@]}" -type d -empty -delete
 
 	# check any errors
 	if [ -s rsync.err ]; then
