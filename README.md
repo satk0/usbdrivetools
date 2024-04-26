@@ -1,6 +1,6 @@
 <h1 align="center"> <code>usbdrivetools</code> - USB Drive Tools </h1>
 
-Simple bash tools that aims to help transfer files to USB Drive and monitor their syncing progress. 
+Simple bash tools that aim to help transfer files to USB Drive and monitor their syncing progress. 
 
 Solving, so called, [USB-stick stall problem](https://lwn.net/Articles/572911/) (when files aren't fully copied even though they appear so on USB Drive).
 
