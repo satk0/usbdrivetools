@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+# Colors for 'echo' command
+GREEN='\033[1;32m'
+RED='\033[1;31m'
+NC='\033[0m' # No Color
+
+function main() {
+	if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
+		echo '  Usage: usbdd BS IF OF'
+		echo 'Writes iso image in BS (BLOCK SIZE) from IF (INFILE) to OF (OUTFILE) and sync it.'
+		echo ''
+		echo '  Example: "usbdd 4M ./foo.iso /dev/foo"'
+		return
+	fi
+
+	args=( "$@" )
+	bs=${args[0]}
+	pathFrom=${args[1]}
+	pathTo=${args[2]}
+
+	startTime=$SECONDS
+
+	echo '1. Running dd...'
+	dd bs="$bs" if="$pathFrom" of="$pathTo" status=progress 2>&1| tee dd.out
+
+	# check any errors
+	ddErr=$( cat dd.out )
+	if [[ "$ddErr" == *'dd:'* ]]; then
+		if [[ "$ddErr" == *'Permission denied'* ]]; then
+			echo -e "${GREEN}Try run it with sudo:${NC}"
+			echo "  sudo usbdd $bs $pathFrom $pathTo"
+		fi
+		echo -e "${RED}Quiting...${NC}" >&2
+		return
+	fi
+	rm -f ./dd.out
+
+	echo '2. Syncing...'
+
+	sync &
+	pID=$!;
+	killErr=""
+
+	while [ "$killErr" = "" ]; do
+		killErr=$(kill -0 "$pID" 2>&1 > /dev/null)
+		cacheInfo=$(grep -E '(Dirty|Writeback):' /proc/meminfo)
+
+		echo "$cacheInfo"
+		sleep 0.5
+
+		clearLastLines 2
+	done
+
+	echo "$cacheInfo"
+
+	elapsedTime=$(( SECONDS - startTime ))
+	echo 'Finished in:'
+	date -ud "@$elapsedTime" +'%H hr %M min %S sec'
+	echo -e "${GREEN}ISO image written successfully!${NC}"
+}
+
+# https://stackoverflow.com/a/78015981
+function clearLastLines() {
+	local linesToClear=$1
+
+	for (( i=0; i<linesToClear; i++ )); do
+		tput cuu 1
+		tput el
+	done
+}
+
+main "$@"; exit
