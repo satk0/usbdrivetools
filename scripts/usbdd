@@ -6,35 +6,41 @@ RED='\033[1;31m'
 NC='\033[0m' # No Color
 
 function main() {
-	if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
-		echo '  Usage: usbdd BS IF OF'
-		echo 'Writes iso image in BS (BLOCK SIZE) from IF (INFILE) to OF (OUTFILE) and sync it.'
-		echo ''
-		echo '  Example: "usbdd 4M ./foo.iso /dev/foo"'
+	if [ "$#" -ne 2 ]; then
+		echo '  Usage: usbdd IF OF'
+		echo 'Writes iso image from IF (INFILE) to OF (OUTFILE) and sync it.'
+		echo '  Example: "usbdd ./foo.iso /dev/foo"'
 		return
 	fi
 
 	args=( "$@" )
-	bs=${args[0]}
-	pathFrom=${args[1]}
-	pathTo=${args[2]}
+	pathFrom=${args[0]}
+	pathTo=${args[1]}
 
 	startTime=$SECONDS
 
+	# https://www.linuxquestions.org/questions/slackware-14/dd-and-status=progress-4175581355/
+	# TLDR; It avoids hanging `dd` command
+	echo "0. Obtaining ${pathTo} optimal I/O size..."
+
+	optimalIOSize=$(sudo fdisk -l "$pathTo" | grep "I/O size (minimum/optimal):" | grep -Eo "[0-9]+" | tail -n1)
+	echo "${pathTo} optimal I/O size: $optimalIOSize"
+
 	echo '1. Running dd...'
-	dd bs="$bs" if="$pathFrom" of="$pathTo" status=progress 2>&1| tee dd.out
+
+	dd bs="$optimalIOSize" if="$pathFrom" of="$pathTo" status=progress 2>&1 | tee dd.err
 
 	# check any errors
-	ddErr=$( cat dd.out )
+	ddErr=$( cat dd.err )
 	if [[ "$ddErr" == *'dd:'* ]]; then
 		if [[ "$ddErr" == *'Permission denied'* ]]; then
-			echo -e "${GREEN}Try run it with sudo:${NC}"
-			echo "  sudo usbdd $bs $pathFrom $pathTo"
+			echo "Try run it with sudo:"
+			echo -e "  ${GREEN}sudo usbdd $pathFrom $pathTo${NC}"
 		fi
 		echo -e "${RED}Quiting...${NC}" >&2
 		return
 	fi
-	rm -f ./dd.out
+	rm -f ./dd.err
 
 	echo '2. Syncing...'
 
