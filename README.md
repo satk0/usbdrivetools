@@ -22,9 +22,15 @@ Clone the repo:
 
     git clone git@github.com:satk0/usbdrivetools.git
 
-Symlink scripts to `~/.local/bin/` (run from project directory):
+Symlink scripts to `/usr/local/bin/` (recommended, copying to external usb drives requires `sudo`):
+
+    sudo ln -s "$PWD"/scripts/* /usr/local/bin/
+
+or to `~/.local/bin/` (`sudo` would not be able to access the scripts):
 
     ln -s "$PWD"/scripts/* ~/.local/bin/
+
+**NOTE:** Run those commands from project directory!
 
 -----
 
