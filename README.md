@@ -13,6 +13,8 @@ Tools available:
 - `usbcp` - USB Drive enhanced copy
 - `usbmv` - USB Drive enhanced move
 - `usbdd` - USB Drive enhanced ISO image writing tool
+- `usbumount` - USB Drive enhanced umount
+- `usbeject` - USB Drive enhanced eject
 
 -----
 

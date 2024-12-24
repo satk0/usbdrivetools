@@ -6,7 +6,7 @@ RED='\033[1;31m'
 NC='\033[0m' # No Color
 
 function main() {
-	if [ -z "$1" ] || [ -z "$2" ]; then 
+	if [ -z "$1" ] || [ -z "$2" ]; then
 		echo '  Usage: usbcp SRC[/] [SRC[/]] DEST'
 		echo 'Copy SRC to (USB mounted) DEST.'
 		echo ''
@@ -34,7 +34,7 @@ function main() {
 	# check any errors
 	if [ -s rsync.err ]; then
 		echo -e "${RED}\"rsync\" execution error:${NC}" >&2
-		cat rsync.err >&2	
+		cat rsync.err >&2
 		rm -f ./rsync.err
 		echo -e "${RED}Quiting...${NC}" >&2
 		return
@@ -45,7 +45,7 @@ function main() {
 	echo '2. Syncing...'
 
 	sync &
-	pID=$!; 
+	pID=$!;
 	killErr=""
 
 	while [ "$killErr" = "" ]; do
@@ -54,7 +54,7 @@ function main() {
 
 		echo "$cacheInfo"
 		sleep 0.5
-		
+
 		clearLastLines 2
 	done
 
